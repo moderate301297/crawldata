@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strings"
 
 	"./dbconnection"
 	"./savedata"
@@ -25,6 +26,16 @@ func QueryAll() (value []string) {
 	return value
 }
 
+func OptimizeUrl(value string) (url string) {
+	if strings.Index(value, "http") == 0 {
+		url = value
+		return url
+	} else {
+		url = "https://www.walmart.com" + value
+		return url
+	}
+}
+
 func main() {
 	value := QueryAll()
 	for _, body := range value {
@@ -38,7 +49,8 @@ func main() {
 			description, _, _, _ := jsonparser.Get(value, "description")
 			imageUrl, _, _, _ := jsonparser.Get(value, "imageUrl")
 			url, _, _, _ := jsonparser.Get(value, "productPageUrl")
-			savedata.SaveData(string(title), string(description), string(dataPath), string(imageUrl), string(url))
+			link := OptimizeUrl(string(url))
+			savedata.SaveData(string(title), string(description), string(dataPath), string(imageUrl), link)
 		}, "items")
 	}
 }
